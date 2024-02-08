@@ -1,5 +1,5 @@
 import { counterReducer } from './counterToolkit/counterReducer';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, isAction } from '@reduxjs/toolkit';
 import { todoReducer } from './todoWithSlice/sliceTodo';
 
 import { persistStore, persistReducer } from 'redux-persist';
@@ -17,5 +17,17 @@ const reducer = {
   todo: persistedReducer,
 };
 
-export const store = configureStore({ reducer });
+const customMiddl = store => {
+  return next => {
+    return action => {
+      console.log('acion', action);
+      return next(action);
+    };
+  };
+};
+
+export const store = configureStore({
+  reducer,
+  middleware: () => [customMiddl],
+});
 export const persistor = persistStore(store);
