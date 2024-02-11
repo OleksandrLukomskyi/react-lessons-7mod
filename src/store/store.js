@@ -1,9 +1,11 @@
 import { counterReducer } from './counterToolkit/counterReducer';
-import { configureStore, isAction } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { todoReducer } from './todoWithSlice/sliceTodo';
 
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { productsReducer } from './products/slice';
+import { postsReducer } from './posts/slice';
 
 const persistConfig = {
   key: 'todo',
@@ -15,19 +17,26 @@ const persistedReducer = persistReducer(persistConfig, todoReducer);
 const reducer = {
   counter: counterReducer,
   todo: persistedReducer,
+  products: productsReducer,
+  posts: postsReducer,
 };
 
-const customMiddl = store => {
-  return next => {
-    return action => {
-      console.log('acion', action);
-      return next(action);
-    };
-  };
-};
+// const customMiddl = store => {
+//   return next => {
+//     return action => {
+//       if (typeof action === 'function') {
+//         action(store.dispatch);
+
+//         return;
+//       }
+
+//       return next(action);
+//     };
+//   };
+// };
 
 export const store = configureStore({
   reducer,
-  middleware: () => [customMiddl],
+  // middleware: () => [customMiddl],
 });
 export const persistor = persistStore(store);

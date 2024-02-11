@@ -1,77 +1,38 @@
+import FormCreateProduct from 'components/Forms/FormCreateProduct';
 import FormSearchProducts from 'components/Forms/FormSearchProducts';
 import ProductsList from 'components/ProductsList'
-import { useState, useCallback, useEffect } from 'react';
-import { getProductsApi} from 'api/products';
-import {useSearchParams } from 'react-router-dom';
+import {useEffect, useState} from 'react';
 
-const LIMIT = 10
+import { useDispatch, useSelector } from 'react-redux';
+import { selectorError, selectorIsLoading, selectorProducts, selectorSingleProduct } from 'store/products/selectors';
+import { createProductsThunk, getProductsThunk } from 'store/products/thunks';
+
+
+
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState(null)
-	const [isLoading, setIsLoading] = useState(false)
-	const [error, setError] = useState('')
-	const [page, setPage] = useState(1)
-	const [isShowBtn, setIsShowBtn] = useState(false)
+	const products = useSelector(selectorProducts)
+	const isLoading = useSelector(selectorIsLoading)
+	const error = useSelector(selectorError)
+	const singleProduct = useSelector(selectorSingleProduct)
+	const dispatch = useDispatch()
+	const [counter, setCounter] = useState(0)
 
 
-
-
-	const [searchParams] = useSearchParams()
-	// const location = useLocation()
-	// console.log('location', location);
-
-// 	const getProducts = useCallback(async () => {
-// 		try {
-// 			setIsLoading(true)
-// 			setError('')
-// 			const response = await getAllProducts(page * LIMIT, LIMIT)
-// 			setProducts((prev) => (prev ? [...prev, ...response.products] : response.products))
-// 			if (response.products.length < response.total)setIsShowBtn(true)
-// 		} catch (error) {
-// 			setError(error.message)
-// 		} finally {
-// 			setIsLoading(false)
-// 		}
-// 	}, [page])
-
-//   const getProductsWithSearch = useCallback(async (query) => {
-// 		try {
-// 			setIsLoading(true)
-// 			setIsShowBtn(false)
-// 			setError('')
-// 			const response = await getSearchProducts(query)
-// 			setProducts( response.products)
-// 			if (response.products.length < response.total)setIsShowBtn(true)
-// 		} catch (error) {
-// 			setError(error.message)
-// 		} finally {
-// 			setIsLoading(false)
-// 		}
-// 	}, [])
-
-	const getProducts = useCallback(async (query) => {
-		try {
-			setIsLoading(true)
-			setIsShowBtn(false)
-			setError('')
-			const response = await getProductsApi(page * LIMIT - LIMIT, LIMIT, query)
-			setProducts((prev) => (prev && !query ? [...prev, ...response.products] : response.products))
-			if (response.products.length < response.total)setIsShowBtn(true)
-		} catch (error) {
-			setError(error.message)
-		} finally {
-			setIsLoading(false)
-		}
-	}, [page])
-
+	
 	useEffect(() => {
-		const query = searchParams.get('search')
-		getProducts(query)
-		query && setPage(1);
-	}, [getProducts, searchParams])
+			dispatch(getProductsThunk())
+		
+	}, [dispatch])
+
+	console.log('singleProduct', singleProduct)
 
 	const handleLoadMore = () => {
-		setPage((prev) => prev + 1)
+		// setPage((prev) => prev + 1)
+	}
+	
+	const createProduct = (body) => {
+  dispatch(createProductsThunk(body))
 	}
 
 
@@ -79,11 +40,15 @@ const ProductsPage = () => {
 
   return (
     <>
-    {isLoading && <h1>loading...</h1>}
-			{error && <h1>{error}</h1>}
-      <FormSearchProducts />
-      {products&&<ProductsList handleLoadMore={handleLoadMore} products={products} isShowBtn={isShowBtn}/>}
+    	<button onClick={() => setCounter((prev) => prev + 1)}>{counter}</button>
+	    {isLoading && <h1>loading...</h1>}
+				{error && <h1>{error}</h1>}
+				<FormCreateProduct createProduct={createProduct}/>
+	      <FormSearchProducts />
+	      {products&&<ProductsList handleLoadMore={handleLoadMore} products={products} />}
+			{/* {products&&<ProductsList handleLoadMore={handleLoadMore} products={products} isShowBtn={isShowBtn}/>} */}
     </>
+    
   )
 }
 

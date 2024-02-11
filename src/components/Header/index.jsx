@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
-
+// 
 const Header = () => {
+	
 	return (
 		<header>
 			<nav>
@@ -20,7 +21,7 @@ const Header = () => {
 					<li>
 						<NavLink to='/posts'>Posts</NavLink>
 					</li>
-					<button onClick={handleClick}></button>
+					
 				</ul>
 			</nav>
 		</header>

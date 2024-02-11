@@ -4,7 +4,7 @@ import Product from "components/Product";
 
 
 const ProductsList = ({products, handleLoadMore, isShowBtn}) => {
-	
+	console.log(products);
 	return (
 		<>
 			
